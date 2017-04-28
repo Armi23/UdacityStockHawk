@@ -161,8 +161,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (PrefUtils.getDisplayMode(this)
                 .equals(getString(R.string.pref_display_mode_absolute_key))) {
             item.setIcon(R.drawable.ic_percentage);
+            item.setTitle(R.string.display_mode_percentage_title);
         } else {
             item.setIcon(R.drawable.ic_dollar);
+            item.setTitle(R.string.display_mode_dollar_title);
         }
     }
 
@@ -182,6 +184,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             PrefUtils.toggleDisplayMode(this);
             setDisplayModeMenuItemIcon(item);
             adapter.notifyDataSetChanged();
+            return true;
+        } else if (id == R.id.menu_refresh) {
+            swipeRefreshLayout.setRefreshing(true);
+            onRefresh();
             return true;
         }
         return super.onOptionsItemSelected(item);
