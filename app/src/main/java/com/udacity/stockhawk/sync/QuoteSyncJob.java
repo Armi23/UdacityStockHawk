@@ -67,13 +67,25 @@ public final class QuoteSyncJob {
             Timber.d(quotes.toString());
 
             ArrayList<ContentValues> quoteCVs = new ArrayList<>();
+            List<String> brokenValues = new ArrayList<>();
 
             while (iterator.hasNext()) {
                 String symbol = iterator.next();
 
 
                 Stock stock = quotes.get(symbol);
+                if (stock == null) {
+                    Timber.e("Stock is null for symbol " + symbol);
+                    brokenValues.add(symbol);
+                    continue;
+                }
+
                 StockQuote quote = stock.getQuote();
+                if (quote.getPrice() == null) {
+                    Timber.e("Price is null for quote for symbol " + symbol);
+                    brokenValues.add(symbol);
+                    continue;
+                }
 
                 float price = quote.getPrice().floatValue();
                 float change = quote.getChange().floatValue();
@@ -112,6 +124,12 @@ public final class QuoteSyncJob {
 
             Intent dataUpdatedIntent = new Intent(ACTION_DATA_UPDATED);
             context.sendBroadcast(dataUpdatedIntent);
+
+            if (!brokenValues.isEmpty()) {
+                for (String symbol: brokenValues) {
+                    PrefUtils.removeStock(context, symbol);
+                }
+            }
 
         } catch (IOException exception) {
             Timber.e(exception, "Error fetching stock quotes");
