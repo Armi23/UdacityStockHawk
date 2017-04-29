@@ -1,11 +1,5 @@
 # Stock Hawk
 
-This is the starter code for project 3 in Udacity's [Android Developer Nanodegree](https://www.udacity.com/course/android-developer-nanodegree-by-google--nd801). 
+This is my implementation for project 3 in Udacity's [Android Developer Nanodegree](https://www.udacity.com/course/android-developer-nanodegree-by-google--nd801) based off their [starter code] (https://github.com/udacity/StockHawk).
 
-Check out Udacity's [Advanced Android App Development](https://www.udacity.com/course/advanced-android-app-development--ud855) course to get the skills you'll need to complete this project!
-
-If you're a Nanodegree student check your work againt the project [rubric](https://review.udacity.com/#!/rubrics/140/view), then click [here](https://classroom.udacity.com/nanodegrees/nd801/parts/8011345406/project) to submit your project.
-
-# Contrubuting
-
-Pull requests gratefully accepted.
+The stock detail page does not work because the API used in the project is broken
