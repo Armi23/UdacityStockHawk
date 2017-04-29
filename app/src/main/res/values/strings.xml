@@ -3,7 +3,7 @@
 
     <string name="pref_stocks_initialized_key" translatable="false">initialized</string>
 
-    <string name="pref_stocks_key">stocks</string>
+    <string name="pref_stocks_key" translatable="false">stocks</string>
 
 
     <string name="pref_display_mode_key" translatable="false">displayMode</string>
@@ -30,9 +30,12 @@
     <string name="error_no_stocks">No stocks added! Hit the floating action button to add one.</string>
     <string name="error_no_stocks_widget">No stocks added! Launch the app to add one.</string>
     <string name="error_no_history_found">Sorry, we could not find any history for this stock. Please try again later</string>
+    <string name="error_already_following_stock">You are already following %s</string>
+    <string name="error_could_not_find">Could not find the following symbols: %s</string>
 
     <string name="toast_stock_added_no_connectivity">Symbol %s added. Will refresh when network available.</string>
     <string name="toast_no_connectivity">Will refresh when network available.</string>
+    <string name="go_to_network_setting_action">Go to network settings</string>
 
     <string name="add_a_stock_content_description">Add a stock</string>
     <string name="display_mode_percentage_title">Set display to percentage</string>

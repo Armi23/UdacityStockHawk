@@ -46,7 +46,7 @@
             </intent-filter>
 
             <intent-filter>
-                <action android:name="com.udacity.stockhawk.UPDATE_WIDGET_LIST"/>
+                <action android:name="com.udacity.stockhawk.ACTION_DATA_UPDATED"/>
             </intent-filter>
 
             <meta-data

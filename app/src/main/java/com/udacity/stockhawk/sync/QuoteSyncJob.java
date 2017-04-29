@@ -30,8 +30,10 @@ import yahoofinance.quotes.stock.StockQuote;
 
 public final class QuoteSyncJob {
 
+    public static final String ACTION_DATA_UPDATED = "com.udacity.stockhawk.ACTION_DATA_UPDATED";
+    public static final String ACTION_REMOVED_BROKEN_DATA = "com.udacity.stockhawk.ACTION_REMOVED_BROKEN_DATA";
+    public static final String EXTRA_BROKEN_DATA = "extra_broken_data";
     private static final int ONE_OFF_ID = 2;
-    private static final String ACTION_DATA_UPDATED = "com.udacity.stockhawk.ACTION_DATA_UPDATED";
     private static final int PERIOD = 300000;
     private static final int INITIAL_BACKOFF = 10000;
     private static final int PERIODIC_ID = 1;
@@ -67,7 +69,7 @@ public final class QuoteSyncJob {
             Timber.d(quotes.toString());
 
             ArrayList<ContentValues> quoteCVs = new ArrayList<>();
-            List<String> brokenValues = new ArrayList<>();
+            ArrayList<String> brokenValues = new ArrayList<>();
 
             while (iterator.hasNext()) {
                 String symbol = iterator.next();
@@ -129,7 +131,12 @@ public final class QuoteSyncJob {
                 for (String symbol: brokenValues) {
                     PrefUtils.removeStock(context, symbol);
                 }
+
+                Intent intent = new Intent(ACTION_REMOVED_BROKEN_DATA);
+                intent.putStringArrayListExtra(EXTRA_BROKEN_DATA, brokenValues);
+                context.sendBroadcast(intent);
             }
+
 
         } catch (IOException exception) {
             Timber.e(exception, "Error fetching stock quotes");

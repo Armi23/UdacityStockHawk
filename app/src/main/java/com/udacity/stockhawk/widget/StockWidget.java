@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.widget.RemoteViews;
 
 import com.udacity.stockhawk.R;
+import com.udacity.stockhawk.sync.QuoteSyncJob;
 import com.udacity.stockhawk.ui.MainActivity;
 import com.udacity.stockhawk.ui.StockDetailActivity;
 
@@ -16,11 +17,6 @@ import com.udacity.stockhawk.ui.StockDetailActivity;
  * Implementation of App Widget functionality.
  */
 public class StockWidget extends AppWidgetProvider {
-
-    /**
-     * Intent action used to update widget
-     */
-    public static final String ACTION_UPDATE_WIDGET_LIST = "com.udacity.stockhawk.UPDATE_WIDGET_LIST";
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
@@ -43,7 +39,7 @@ public class StockWidget extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (ACTION_UPDATE_WIDGET_LIST.equals(intent.getAction())) {
+        if (QuoteSyncJob.ACTION_DATA_UPDATED.equals(intent.getAction())) {
             updateWidgetList(context);
             return;
         }

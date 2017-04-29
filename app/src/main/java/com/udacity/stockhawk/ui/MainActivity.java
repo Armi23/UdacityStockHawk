@@ -1,13 +1,15 @@
 package com.udacity.stockhawk.ui;
 
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -20,13 +22,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
 import com.udacity.stockhawk.sync.QuoteSyncJob;
-import com.udacity.stockhawk.widget.StockWidget;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,6 +40,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final int STOCK_LOADER = 0;
     @SuppressWarnings("WeakerAccess")
+    @BindView(R.id.main_activity_layout)
+    View rootView;
+    @SuppressWarnings("WeakerAccess")
     @BindView(R.id.recycler_view)
     RecyclerView stockRecyclerView;
     @SuppressWarnings("WeakerAccess")
@@ -47,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @BindView(R.id.error)
     TextView error;
     private StockAdapter adapter;
+    private IntentFilter intentFilter;
+    private BroadcastReceiver broadcastReceiver;
 
     @Override
     public void onClick(String symbol) {
@@ -62,6 +69,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        intentFilter = new IntentFilter();
+        intentFilter.addAction(QuoteSyncJob.ACTION_REMOVED_BROKEN_DATA);
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (QuoteSyncJob.ACTION_REMOVED_BROKEN_DATA.equals(intent.getAction())) {
+                    List<String> brokenValues = intent.getStringArrayListExtra(QuoteSyncJob.EXTRA_BROKEN_DATA);
+                    Timber.e("received broken data - " + brokenValues);
+                    if (brokenValues.isEmpty()) {
+                        return;
+                    }
+
+                    Snackbar snackbar = Snackbar.make(rootView, getString(R.string.error_could_not_find, brokenValues.toString()), Snackbar.LENGTH_LONG);
+                    snackbar.show();
+                }
+            }
+        };
 
         adapter = new StockAdapter(this, this);
         stockRecyclerView.setAdapter(adapter);
@@ -91,6 +116,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(broadcastReceiver);
+    }
+
     private boolean networkUp() {
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -109,7 +146,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             error.setVisibility(View.VISIBLE);
         } else if (!networkUp()) {
             swipeRefreshLayout.setRefreshing(false);
-            Toast.makeText(this, R.string.toast_no_connectivity, Toast.LENGTH_LONG).show();
+            Snackbar snackbar = Snackbar.make(rootView, R.string.toast_no_connectivity, Snackbar.LENGTH_LONG);
+            snackbar.setAction(R.string.go_to_network_setting_action, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                }
+            });
+            snackbar.show();
         } else if (PrefUtils.getStocks(this).size() == 0) {
             swipeRefreshLayout.setRefreshing(false);
             error.setText(getString(R.string.error_no_stocks));
@@ -124,13 +168,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     void addStock(String symbol) {
+        if (PrefUtils.getStocks(this).contains(symbol)) {
+            Snackbar snackbar = Snackbar.make(rootView, getString(R.string.error_already_following_stock, symbol), Snackbar.LENGTH_LONG);
+            snackbar.show();
+            return;
+        }
+
         if (symbol != null && !symbol.isEmpty()) {
 
             if (networkUp()) {
                 swipeRefreshLayout.setRefreshing(true);
             } else {
                 String message = getString(R.string.toast_stock_added_no_connectivity, symbol);
-                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+                Snackbar snackbar = Snackbar.make(rootView, message, Snackbar.LENGTH_LONG);
+                snackbar.show();
             }
 
             PrefUtils.addStock(this, symbol);
@@ -154,7 +205,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             error.setVisibility(View.GONE);
         }
         adapter.setCursor(data);
-        updateStockWidget();
     }
 
 
@@ -199,16 +249,5 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * Called to update stock widget
-     */
-    private void updateStockWidget() {
-        Intent intent = new Intent();
-        intent.setAction(StockWidget.ACTION_UPDATE_WIDGET_LIST);
-        int[] ids = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), StockWidget.class));
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,ids);
-        sendBroadcast(intent);
     }
 }
