@@ -6,10 +6,14 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.TextView;
 
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import timber.log.Timber;
 
 public class StockDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -29,10 +33,14 @@ public class StockDetailActivity extends AppCompatActivity implements LoaderMana
      */
     private String symbol;
 
+    @BindView(R.id.stock_detail_error)
+    TextView error;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stock);
+        ButterKnife.bind(this);
 
         symbol = getIntent().getStringExtra(EXTRA_SYMBOL);
         Timber.d("symbol retrieved - " + symbol);
@@ -51,7 +59,13 @@ public class StockDetailActivity extends AppCompatActivity implements LoaderMana
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         data.moveToFirst();
         String history = data.getString(Contract.Quote.POSITION_HISTORY);
-        Timber.e("History - " + history); // TODO: YahooFinance API is broken, need to finish this after fix is found
+        if (history.isEmpty()) {
+            error.setVisibility(View.VISIBLE);
+            error.setText(R.string.error_no_history_found);
+        } else {
+            error.setVisibility(View.GONE);
+            Timber.e("History - " + history); // TODO: YahooFinance API is broken, need to finish this after fix is found
+        }
         data.close();
     }
 

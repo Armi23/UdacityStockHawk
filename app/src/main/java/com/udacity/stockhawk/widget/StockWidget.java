@@ -30,6 +30,7 @@ public class StockWidget extends AppWidgetProvider {
 
         Intent intent = new Intent(context, StockWidgetService.class);
         views.setRemoteAdapter(R.id.stock_list, intent);
+        views.setEmptyView(R.id.stock_list, R.id.widget_list_empty_view);
 
         Intent stockDetailIntent = new Intent(context, StockDetailActivity.class);
         Intent mainActivityIntent = new Intent(context, MainActivity.class);

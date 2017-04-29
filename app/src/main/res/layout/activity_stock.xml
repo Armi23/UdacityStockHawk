@@ -5,4 +5,13 @@
     android:layout_height="match_parent"
     tools:context="com.udacity.stockhawk.ui.StockDetailActivity">
 
+    <TextView
+        android:id="@+id/stock_detail_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textAppearance="@android:style/TextAppearance.Medium"
+        android:visibility="gone"
+        tools:text="Error message" />
+
 </LinearLayout>
