@@ -37,5 +37,7 @@
     <string name="display_mode_dollar_title">Set display to dollar</string>
 
     <string name="menu_refresh">Refresh stock</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 
 </resources>
