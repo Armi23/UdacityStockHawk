@@ -9,7 +9,7 @@ import com.udacity.stockhawk.data.Contract;
 
 import timber.log.Timber;
 
-public class StockActivity extends AppCompatActivity {
+public class StockDetailActivity extends AppCompatActivity {
 
     /**
      * Extra to carry symbol

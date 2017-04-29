@@ -1,12 +1,14 @@
 package com.udacity.stockhawk.widget;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
 import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
+import com.udacity.stockhawk.ui.StockDetailActivity;
 
 /**
  * Factory used for the stock widget
@@ -61,6 +63,10 @@ public class StockWidgetRemoteFactory implements RemoteViewsService.RemoteViewsF
         remoteViews.setTextViewText(R.id.symbol, cursor.getString(Contract.Quote.POSITION_SYMBOL));
         remoteViews.setTextViewText(R.id.price, cursor.getString(Contract.Quote.POSITION_PRICE));
         remoteViews.setTextViewText(R.id.change, cursor.getString(Contract.Quote.POSITION_ABSOLUTE_CHANGE));
+
+        Intent intent = new Intent();
+        intent.putExtra(StockDetailActivity.EXTRA_SYMBOL, cursor.getString(Contract.Quote.POSITION_SYMBOL));
+        remoteViews.setOnClickFillInIntent(R.id.widget_item, intent);
         return remoteViews;
     }
 
